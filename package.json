@@ -1,0 +1,30 @@
+{
+  "name": "nusantara-digital-twin",
+  "version": "1.0.0",
+  "description": "Interactive Geospatial Digital Twin, Policy Simulation Sandbox & Telemetry Command Center for Indonesia 2045",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -l 8080",
+    "dev": "npx serve . -l 8080",
+    "serve": "npx serve . -l 8080",
+    "test": "echo \"Ready for validation test suites\" && exit 0"
+  },
+  "keywords": [
+    "indonesia",
+    "digital-twin",
+    "gis",
+    "leaflet",
+    "chartjs",
+    "simulation",
+    "indonesia-2045",
+    "smart-city",
+    "command-center",
+    "it-del"
+  ],
+  "author": "Stephen Simamora (IT Del)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simamorastephen-byte/website-kasir-stephen-simamora"
+  }
+}

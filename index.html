@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nusantara Digital Twin - Platform Simulasi & Telemetri Interaktif Seluruh 38 Provinsi di Indonesia menuju Visi Indonesia Emas 2045.">
+    <meta name="keywords" content="Indonesia Digital Twin, Peta Interaktif Indonesia, Simulasi Indonesia Emas 2045, 38 Provinsi Indonesia, GIS Nusantara">
+    <meta name="author" content="Nusantara Digital Twin Command">
+    <title>Nusantara Digital Twin | Indonesia Telemetry & Future Simulation Engine</title>
+
+    <!-- Leaflet GIS Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <!-- Custom Cyber Design System -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Chart.js for Futuristic Telemetry Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- ==========================================================================
+             TOP CYBER COMMAND HUD HEADER
+             ========================================================================== -->
+        <header class="hud-header">
+            <div class="brand-section">
+              
+                <div class="brand-icon">🌐</div>
+                <div class="brand-title">
+                    <h1>NUSANTARA DIGITAL TWIN</h1>
+                    <div class="brand-badge">
+                        <span class="pulse-dot"></span>
+                        <span>SIMULASI & TELEMETRI NASIONAL LIVE • INDONESIA 2045</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timezone Clocks Telemetry -->
+            <div class="time-telemetry">
+                <div class="time-pill">
+                    <span class="zone">WIB</span>
+                    <span class="val" id="clockWIB">--:--:--</span>
+                </div>
+                <div class="time-pill">
+                    <span class="zone">WITA</span>
+                    <span class="val" id="clockWITA">--:--:--</span>
+                </div>
+                <div class="time-pill">
+                    <span class="zone">WIT</span>
+                    <span class="val" id="clockWIT">--:--:--</span>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="header-actions">
+                <button class="hud-btn btn-gold" id="openSimulationModalBtn">
+                    <span>🧪</span> What-If Sandbox 2045
+                </button>
+                <button class="hud-btn" id="openCompareModalBtn">
+                    <span>⚖️</span> Komparasi Daerah
+                </button>
+                
+               
+            </div>
+        </header>
+
+        <!-- ==========================================================================
+             MAIN WORKSPACE AREA
+             ========================================================================== -->
+        <main class="main-workspace">
+            <!-- LEFT SIDEBAR: DIRECTORY & SEARCH -->
+            <aside class="left-sidebar">
+                <div class="sidebar-header">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="provinceSearchInput" class="search-input" placeholder="Cari 38 provinsi, ibukota, pulau...">
+                    </div>
+                    <!-- Filter Pills by Region -->
+                    <div class="filter-pills">
+                        <button class="pill-btn active" data-island="Semua">Semua (38)</button>
+                        <button class="pill-btn" data-island="Sumatera">Sumatera</button>
+                        <button class="pill-btn" data-island="Jawa">Jawa</button>
+                        <button class="pill-btn" data-island="Kalimantan">Kalimantan</button>
+                        <button class="pill-btn" data-island="Sulawesi">Sulawesi</button>
+                        <button class="pill-btn" data-island="Bali & Nusa Tenggara">Bali & NT</button>
+                        <button class="pill-btn" data-island="Maluku">Maluku</button>
+                        <button class="pill-btn" data-island="Papua">Papua</button>
+                    </div>
+                </div>
+
+                <!-- Scrollable Province List -->
+                <div class="province-list" id="provinceListContainer">
+                    <!-- Populated via app.js -->
+                </div>
+            </aside>
+
+            <!-- CENTER MAP VIEWPORT -->
+            <section class="center-map-area">
+                <div id="mapContainer"></div>
+
+                <!-- Floating Top Choropleth Controls -->
+                <div class="map-floating-bar">
+                    <div class="hud-pill-group">
+                        <button class="metric-select-btn active" data-metric="ipm">🎓 IPM</button>
+                        <button class="metric-select-btn" data-metric="pdrb">📈 PDRB</button>
+                        <button class="metric-select-btn" data-metric="kepadatan">👥 Kepadatan</button>
+                        <button class="metric-select-btn" data-metric="lingkungan">🌿 Lingkungan</button>
+                        <button class="metric-select-btn" data-metric="digital">⚡ Smart City</button>
+                    </div>
+                </div>
+
+                <!-- Floating GIS Layers Toggles -->
+                
+
+                <!-- Floating National KPI Summary -->
+                <div class="national-kpi-bar">
+                    <div class="kpi-mini-card glow-cyan">
+                        <span>Total Penduduk</span>
+                        <strong>287.2 Juta</strong>
+                    </div>
+                    <div class="kpi-mini-card glow-green">
+                        <span>PDB Nasional</span>
+                        <strong>Rp6.552,1 triliun</strong>
+                    </div>
+                    <div class="kpi-mini-card glow-amber">
+                        <span>Rata-Rata IPM</span>
+                        <strong>75.90</strong>
+                    </div>
+                    <div class="kpi-mini-card">
+                        <span>Hutan Lestari</span>
+                        <strong>95.5 Jt Ha</strong>
+                    </div>
+                </div>
+
+                <!-- Map Legend -->
+                <div class="map-legend-box" id="mapLegendContent">
+                    <!-- Populated dynamically via map.js -->
+                </div>
+            </section>
+
+            <!-- RIGHT SIDEBAR: PROVINCIAL DOSSIER INSPECTOR -->
+            <aside class="right-dossier">
+                <div class="dossier-header">
+                    <div class="dossier-title-row">
+                        <div>
+                            <h2 id="dossierProvName">Kalimantan Timur</h2>
+                            <div class="capital-name" id="dossierCapital">Ibukota: Samarinda (Lokasi IKN Nusantara)</div>
+                        </div>
+                        <span class="hud-tag cyber-cyan" id="dossierIsland">Kalimantan</span>
+                    </div>
+                    <div style="margin-top: 6px; font-size: 0.7rem; color: var(--text-muted);" id="dossierEstablished">Est. 1956</div>
+                </div>
+
+                <!-- Dossier Tabs -->
+                <nav class="dossier-tabs">
+                    <button class="tab-btn active" data-tab="overview">Ringkasan</button>
+                    <button class="tab-btn" data-tab="demographics">Demografi</button>
+                    <button class="tab-btn" data-tab="economy">Ekonomi</button>
+                    <button class="tab-btn" data-tab="education">Pendidikan</button>
+                    <button class="tab-btn" data-tab="infrastructure">Infrastruktur</button>
+                    <button class="tab-btn" data-tab="environment">Lingkungan</button>
+                    <button class="tab-btn" data-tab="telemetry">IoT Live</button>
+                </nav>
+
+                <!-- Dossier Content Body -->
+                <div class="dossier-body">
+                    <div class="tab-content active" id="overviewTabContent"></div>
+                    <div class="tab-content" id="demographicsTabContent"></div>
+                    <div class="tab-content" id="economyTabContent"></div>
+                    <div class="tab-content" id="educationTabContent"></div>
+                    <div class="tab-content" id="infrastructureTabContent"></div>
+                    <div class="tab-content" id="environmentTabContent"></div>
+                    <div class="tab-content" id="telemetryTabContent"></div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- ==========================================================================
+             WHAT-IF SIMULATION SANDBOX MODAL
+             ========================================================================== -->
+        <div class="modal-overlay" id="simulationModalOverlay">
+            <div class="simulation-modal">
+                <div class="modal-header">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">🧪</span>
+                        <div>
+                            <h3>WHAT-IF SIMULATION SANDBOX (INDONESIA 2045)</h3>
+                            <span style="font-size: 0.72rem; color: var(--cyan); font-family: var(--font-mono);">MODEL PREDIKSI KEBIJAKAN & TRANSFORMASI MAKRO EKONOMI</span>
+                        </div>
+                    </div>
+                    <button class="modal-close-btn" id="closeSimulationModalBtn">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Left: Control Sliders & Presets -->
+                    <div class="sim-controls-panel">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Pilih Skenario Kebijakan:</div>
+                        <div class="preset-selector">
+                            <button class="preset-btn" data-preset="statusQuo">Status Quo</button>
+                            <button class="preset-btn active" data-preset="indonesiaEmas2045">⭐ Indonesia Emas 2045</button>
+                            <button class="preset-btn" data-preset="netZero2050">🌿 Super Green 2050</button>
+                            <button class="preset-btn" data-preset="digitalHub">⚡ High-Tech AI Hub</button>
+                        </div>
+
+                        <!-- Sliders -->
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>☀️ Akselerasi Transisi EBT (Energi Bersih)</span>
+                                <strong id="valGreenEnergy">+45%</strong>
+                            </div>
+                            <input type="range" id="sliderGreenEnergy" class="cyber-slider" min="0" max="100" value="45">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>🎓 Investasi Talenta Digital, AI & Pendidikan</span>
+                                <strong id="valDigital">+50%</strong>
+                            </div>
+                            <input type="range" id="sliderDigital" class="cyber-slider" min="0" max="100" value="50">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>🏗️ Pembangunan Infrastruktur & Smart Logistics</span>
+                                <strong id="valInfra">+35%</strong>
+                            </div>
+                            <input type="range" id="sliderInfra" class="cyber-slider" min="0" max="100" value="35">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>🌲 Target Reforestasi & Konservasi Hutan</span>
+                                <strong id="valForest">+8 Jt Ha</strong>
+                            </div>
+                            <input type="range" id="sliderForest" class="cyber-slider" min="0" max="20" value="8">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>🏛️ Akselerasi Pertumbuhan IKN Nusantara</span>
+                                <strong id="valIkn">+60%</strong>
+                            </div>
+                            <input type="range" id="sliderIkn" class="cyber-slider" min="0" max="100" value="60">
+                        </div>
+                    </div>
+
+                    <!-- Right: Dynamic Simulation Results & Projections -->
+                    <div class="sim-results-panel">
+                        <div class="stat-grid-3">
+                            <div class="hud-card accent-green">
+                                <div class="hud-card-label">Laju PDB</div>
+                                <div class="hud-card-value" id="simGrowthRate">+5.29% /thn</div>
+                            </div>
+                            <div class="hud-card accent-green">
+                                <div class="hud-card-label">PDB 2045</div>
+                                <div class="hud-card-value" id="simGdpTrillion">Rp147.000 triliun</div>
+                            </div>
+                            <div class="hud-card accent-green">
+                                <div class="hud-card-label">PDB/Kapita</div>
+                                <div class="hud-card-value" id="simGdpPerCapita">$5.000 USD</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-grid-3">
+                            <div class="hud-card accent-amber">
+                                <div class="hud-card-label">Proyeksi IPM</div>
+                                <div class="hud-card-value" id="simIpm">84.20</div>
+                            </div>
+                            <div class="hud-card accent-purple">
+                                <div class="hud-card-label">Bauran EBT</div>
+                                <div class="hud-card-value" id="simRenewableShare">48.5%</div>
+                            </div>
+                            <div class="hud-card">
+                                <div class="hud-card-label">Net Zero</div>
+                                <div class="hud-card-value" id="simNetZeroYear">2048</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart Trend Projections -->
+                        <div class="hud-card">
+                            <div class="hud-card-label">Trajektori Pertumbuhan Ekonomi Nasional (2025 - 2045)</div>
+                            <div class="chart-wrapper" style="height: 140px;">
+                                <canvas id="simulationTrendChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- AI Diagnostic Takeaways -->
+                        <div class="ai-diagnostic-box">
+                            <h4>🤖 Nusantara AI Executive Diagnostic</h4>
+                            <ul id="simAiDiagnosticList">
+                                <!-- Populated dynamically via simulation.js -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             PROVINCE COMPARISON MODAL
+             ========================================================================== -->
+        <div class="modal-overlay" id="comparisonModalOverlay">
+            <div class="simulation-modal comparison-modal">
+                <div class="modal-header">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">⚖️</span>
+                        <div>
+                            <h3>KOMPARASI METRIK ANTAR PROVINSI</h3>
+                            <span style="font-size: 0.72rem; color: var(--cyan); font-family: var(--font-mono);">ANALISIS MULTIDIMENSI SIDE-BY-SIDE</span>
+                        </div>
+                    </div>
+                    <button class="modal-close-btn" id="closeCompareModalBtn">&times;</button>
+                </div>
+
+                <div class="modal-body" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <div style="display: flex; gap: 12px; margin-bottom: 14px;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.72rem; color: var(--cyan); display: block; margin-bottom: 4px;">PROVINSI A</label>
+                                <select id="compareSelectA" class="search-input"></select>
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.72rem; color: var(--amber); display: block; margin-bottom: 4px;">PROVINSI B</label>
+                                <select id="compareSelectB" class="search-input"></select>
+                            </div>
+                        </div>
+
+                        <div class="chart-wrapper" style="height: 280px;">
+                            <canvas id="comparisonRadarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="hud-card" style="height: 100%;">
+                            <div class="hud-card-label">Tabel Perbandingan Parameter Utama</div>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted); text-align: left;">
+                                        <th style="padding: 6px 4px;">Indikator</th>
+                                        <th style="padding: 6px 4px; color: var(--cyan);">Provinsi A</th>
+                                        <th style="padding: 6px 4px; color: var(--amber);">Provinsi B</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comparisonTableBody">
+                                    <!-- Populated dynamically via app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/geojson.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/simulation.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
